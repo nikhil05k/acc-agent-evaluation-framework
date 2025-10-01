@@ -182,6 +182,3 @@ Metrics: {
 
 
 👉 This `README.md` is written so that **a new contributor can clone, set their key, and run the Fibonacci case right away**.  
-
-
-```

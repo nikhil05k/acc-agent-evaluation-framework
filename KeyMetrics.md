@@ -96,4 +96,10 @@
     - RBAC
     - Deployment Guides
     - Kubernetes Support
+
+13. **Prebuilt Agent Coverage**
+    
+    - Variety of prebuilt agents
+    - Ease of Customisation
+    - Quality/Documentation
     

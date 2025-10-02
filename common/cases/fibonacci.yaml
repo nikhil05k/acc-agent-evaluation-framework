@@ -1,0 +1,30 @@
+name: fibonacci
+description: "Generate a Python snippet that prints the first 10 Fibonacci numbers. Return only a fenced python code block."
+
+prompts:
+  system: |
+    You are a helpful Python coding assistant.
+    Output ONLY a Python code block fenced with ```python ... ```.
+  user: |
+    Write a short Python code snippet that prints the first 10 numbers in the Fibonacci sequence.
+    Requirements:
+    - Print exactly 10 numbers.
+    - Print numbers in order starting from 0.
+    - Keep it minimal and readable.
+    - Return ONLY a single fenced code block (```python ... ```), with no extra text.
+
+llm:
+  model: meta-llama/Llama-3.1-70B-Instruct #meta for AI Refinery # gemini-2.0-flash for adk # for openAI compatible APIs openrouter/deepseek/deepseek-chat-v3.1:free         # can override registry default
+  temperature: 0.2
+
+
+expectations:
+  # Used by metrics/evaluators
+  expected_sequence: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+  contains: ["print", "for"]   # quick sanity keyword check
+
+metrics:
+  - latency
+  - success_keywords
+  - functional_correctness
+  - cost

@@ -1,0 +1,22 @@
+name: fibonacci_exec
+description: "Agent executes Python code to return the first 10 Fibonacci numbers."
+
+prompts:
+  system: |
+    Write and execute Python code to solve problems
+  user: |
+    Write and execute a Python function to calculate the Fibonacci sequence up to the 10th number and print the result.
+    Return only the final numerical result as plain text, without markdown or code blocks.
+
+
+llm:
+  model: meta-llama/Llama-3.1-70B-Instruct #meta for AI Refinery # gemini-2.0-flash for adk # for openAI compatible APIs openrouter/deepseek/deepseek-chat-v3.1:free         # can override registry default
+  temperature: 0.2
+
+expectations:
+  expected_sequence: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+metrics:
+  - latency
+  - sequence_correctness
+  - cost

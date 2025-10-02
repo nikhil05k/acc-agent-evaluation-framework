@@ -1,0 +1,24 @@
+name: websearch
+description: "Agent performs a web search and summarizes the results."
+
+prompts:
+  system: |
+    You are a research assistant with access to the web.
+    Your job is to find relevant information and summarize it clearly.
+  user: |
+    Find and summarize the latest news about SpaceX Starship's most recent launch.
+    Provide a concise 3–5 sentence summary.
+
+llm:
+  model: openai/gpt-4o #meta for AI Refinery # gemini-2.0-flash for adk # for openAI compatible APIs openrouter/deepseek/deepseek-chat-v3.1:free         # can override registry default
+  temperature: 0.2
+
+expectations:
+  # For research tasks, expectations are fuzzy.
+  # We just require non-empty text and that certain keywords appear.
+  required_keywords: ["Starship", "SpaceX"]
+
+metrics:
+  - latency
+  - success_keywords
+  - cost

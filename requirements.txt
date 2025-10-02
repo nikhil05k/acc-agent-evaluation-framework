@@ -1,0 +1,16 @@
+# Core dependencies
+python-dotenv>=1.0.1
+
+# CrewAI
+crewai>=0.28.8
+crewai-tools>=0.2.0
+
+# ADK (Google Agent Development Kit)
+google-adk>=0.1.5
+
+# AI Refinery SDK (Accenture)
+airefinery-sdk==1.18.3
+
+# Evaluation utilities
+pyyaml>=6.0.2
+pydantic>=2.7.0

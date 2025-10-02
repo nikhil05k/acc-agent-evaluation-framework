@@ -1,184 +1,155 @@
+# 🧪 Agentic Framework Evaluation
 
-# `README.md`
+This project provides a **unified evaluation harness** for comparing different **agentic frameworks** (CrewAI, ADK, AI Refinery SDK, etc.) across a common set of tasks.  
+It is designed to highlight **strengths, limitations, and opportunities** across frameworks in terms of setup, LLM compatibility, tool usage, orchestration, and enterprise readiness.
 
-# Agent Evaluation Framework
+----------
 
-A lightweight, extensible framework for **evaluating agentic frameworks** (e.g. CrewAI, LangGraph, AutoGen, AdalFlow) across consistent tasks, prompts, and metrics.
+## 📌 Features
 
-The goal: **apples-to-apples comparison** of how different agent frameworks handle the same scenarios.
+-   **Common Case Definitions**:  
+    Prompts and expected outputs defined in YAML (`common/cases/`)
+    
+-   **Pluggable Framework Runners**:  
+    Each framework (CrewAI, ADK, AI Refinery) has its own runner class implementing a shared interface
+    
+-   **Unified Evaluation**:  
+    Run the same case across multiple frameworks and compare outputs + metrics
+    
+-   **Metrics Engine**:  
+    Latency, correctness, success rate, tool usage, etc.  
+    Extensible for new evaluation dimensions
+    
 
----
+----------
 
-## 🚀 Features
+## 📂 Directory Structure
 
-- **Framework-agnostic interface**  
-  One adapter contract (`FrameworkAdapter`) so any agent framework can be plugged in.
-
-- **Case-based evaluation**  
-  Define tasks in YAML (`cases/`) with agents, prompts, and metrics.  
-  Example: *generate a Python snippet for Fibonacci.*
-
-- **Reusable prompts**  
-  Centralized system/task prompts in `common/prompts/`.
-
-- **Unified agent specs**  
-  Framework-independent `AgentSpec` with memory, tools, and defaults (`common/agents/`).
-
-- **Metrics-first design**  
-  Out-of-the-box metrics for:
-  - Latency
-  - Cost
-  - Keyword-based success rate
-  - Functional correctness (executes generated Python snippets safely in a sandbox)
-
-- **Cross-platform code execution**  
-  Generated Python snippets are sandboxed in a child process with timeout, safe on Linux/macOS/Windows.
-
----
-
-## 📂 Repository Structure
-
+```
+agent-evaluation-framework/
+│
+├── common/
+│   ├── cases/             # YAML definitions of evaluation cases
+│   ├── evaluators/        # Code correctness, functional checks
+│   ├── metrics/           # Metrics calculators (latency, cost, correctness)
+│   └── utils/             # Shared utilities (prompt builder, runner helpers)
+│
+├── frameworks/
+│   ├── crewai_runner.py   # CrewAI integration
+│   ├── adk_runner.py      # ADK (Gemini) integration
+│   └── airefinery_runner.py # AI Refinery SDK integration
+│
+├── runner.py              # Common entrypoint to run evaluations
+└── README.md              # This file
 
 ```
 
-agent-evals/  
-├─ common/  
-│ ├─ agents/ # AgentSpec, registry, tool/memory interfaces  
-│ ├─ prompts/ # System & task prompts (Jinja2 templates)  
-│ ├─ metrics/ # Metric implementations  
-│ └─ evaluators/ # Evaluators (e.g. Python snippet correctness)  
-├─ frameworks/  
-│ ├─ base.py # FrameworkAdapter interface  
-│ └─ crewai/ # CrewAI adapter (first supported framework)  
-├─ cases/  
-│ └─ fibonacci/ # First case (Python Fibonacci code snippet)  
-├─ scripts/  
-│ └─ run_case.py # Runner CLI  
-└─ results/ # (to be populated with outputs, scores, reports)
+----------
 
-```
+## 🚀 Getting Started
 
----
+### 1. Clone the Repo
 
-## ⚡ Quickstart
-
-### 1. Install dependencies
 ```bash
+git clone <git url>
+cd acc-agent-evaluation-framework
+
+```
+
+### 2. Install Dependencies
+
+Create a virtual environment and install requirements:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
 
 ```
 
-Dependencies include:
+### 3. Configure API Keys
 
--   `crewai`
-    
--   `langchain-openai`
-    
--   `python-dotenv`
-    
--   `pyyaml`
-    
+Create a `.env` file in the project root with keys for the frameworks you want to evaluate based on `.env.example`
 
-### 2. Configure API keys
+### 4. Run Evaluations
 
-Add an `.env` file in the project root:
-
-```
-OPENROUTER_API_KEY=sk-...
-
-```
-
-### 3. Run the Fibonacci case
+Run a specific case on a framework:
 
 ```bash
-python scripts/run_case.py --case cases/fibonacci/case.yaml --framework crewai
+python runner.py --frameworks crewai --cases fibonacci
 
 ```
 
-### Example output
+Run multiple frameworks on multiple cases:
 
-```
-=== Case Result ===
-Case: fibonacci
-Framework: crewai
-Output:
- def fibonacci(n):
-     a, b = 0, 1
-     for _ in range(n):
-         print(a)
-         a, b = b, a + b
-
- fibonacci(10)
-
-Metrics: {
-  'latency': 5.50,
-  'success_rate': 1.0,
-  'cost': None,
-  'functional_correctness': 1.0,
-  'functional_correctness_details': {
-    'ok': True,
-    'got': [0,1,1,2,3,5,8,13,21,34],
-    'expected': [0,1,1,2,3,5,8,13,21,34]
-  }
-}
+```bash
+python runner.py --frameworks crewai adk airefinery --cases fibonacci fibonacci_exec websearch
 
 ```
 
 ----------
 
-## 🧩 Adding New Frameworks
+## 🧪 Example Cases
 
-1.  Create a subdir under `frameworks/` (e.g. `frameworks/langgraph/adapter.py`).
+-   **fibonacci** – Generate Python code to print the first 10 Fibonacci numbers.
     
-2.  Implement the `FrameworkAdapter` interface:
+-   **fibonacci_exec** – Execute Fibonacci code and validate numeric output.
     
-    -   `create_agent(spec: AgentSpec)`
-        
-    -   `run(agent, io: AgentIO) -> AgentResult`
-        
-3.  Register it in the runner.
+-   **websearch** – Use framework’s search capabilities to answer factual queries.
+    
+
+Each case is defined in YAML with system/user prompts and expectations.
+
+----------
+
+## 📊 Metrics
+
+Current metrics include:
+
+-   **Latency** (time to first/full response)
+    
+-   **Success rate** (did it produce an answer?)
+    
+-   **Functional correctness** (does code run correctly?)
+    
+-   **Tool usage** (did the agent actually invoke a tool?)
+    
+-   **Keyword checks** (for factual answers)
+    
+
+More can be added easily in `common/metrics/`.
+
+----------
+
+## ➕ Adding New Frameworks
+
+To add a new framework:
+
+1.  Create a new runner in `frameworks/<framework>_runner.py`
+    
+2.  Implement methods for supported cases (e.g. `run_fibonacci`, `run_fibonacci_exec`, `run_websearch`)
+    
+3.  Ensure it conforms to the same interface as existing runners
+    
+4.  Register the framework in `runner.py`
     
 
 ----------
 
-## 📈 Adding New Cases
+## 📈 Reporting
 
-1.  Create a folder under `cases/` (e.g. `cases/sorting/`).
-    
-2.  Add `case.yaml`:
-    
-    ```yaml
-    name: sorting
-    description: Generate Python code to sort a list.
-    agents:
-      - id: coder
-        spec: SimpleCoder
-        model: gpt-4o-mini
-    prompts:
-      system: common/prompts/system/default_system.j2
-      user: common/prompts/task/sorting_user.j2
-    metrics:
-      - functional_correctness
-    expectations:
-      expected_sequence: [1, 2, 3, 4, 5]
-    
-    ```
-    
-3.  Add prompt file under `common/prompts/task/`.
-    
+The framework can generate structured results (stdout, JSON, or markdown) to support comparative reports.  
+See `Report.md` for a running evaluation summary.
 
 ----------
 
-## 📊 Next Steps
+## 🙌 Contributing
 
--   Add more frameworks (LangGraph, AutoGen, AdalFlow).
-    
--   Build richer evaluators (RAG precision/recall, reasoning trace checks).
-    
--   Store run results under `results/` and auto-generate leaderboards.
-    
--   Add CI to ensure reproducibility of cases and metrics.
-    
+This is an evolving framework. Contributions are welcome for:
 
-
-👉 This `README.md` is written so that **a new contributor can clone, set their key, and run the Fibonacci case right away**.  
+-   New test cases (multi-agent workflows, RAG, planning, memory)
+    
+-   New frameworks (LangChain, AutoGen, etc.)
+    
+-   New metrics (cost, governance checks, observability)
+   
